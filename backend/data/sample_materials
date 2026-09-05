@@ -1,0 +1,24 @@
+cpse_id,material_code,raw_description,category,material,dimension_1,unit,standard,grade,pressure_rating,voltage_rating,unit_price,quantity_procured,true_cluster
+ONGC,ONGC-1001,SKF BRG 6205 2RS,Bearing,Steel,6205,model,ISO 15,N/A,,,420,200,B1
+SAIL,SAIL-1001,Bearing Deep Groove 6205-2RS SKF,Bearing,Steel,6205,model,ISO 15,N/A,,,445,150,B1
+NTPC,NTPC-1001,DGBB 6205 2RS,Bearing,Steel,6205,model,ISO 15,N/A,,,410,300,B1
+CPCL,CPCL-1001,FAG Bearing 6205 2RS,Bearing,Steel,6205,model,ISO 15,N/A,,,460,100,B2_equiv
+GAIL,GAIL-1001,NSK BRG DGBB 6205-2RS,Bearing,Steel,6205,model,ISO 15,N/A,,,455,120,B2_equiv
+ONGC,ONGC-1002,SKF BRG 6205 open type,Bearing,Steel,6205,model,ISO 15,N/A,,,390,80,B3_family
+NTPC,NTPC-1002,Bearing 6205 - spec not confirmed,Bearing,,6205,model,,,,,400,50,B_insufficient
+ONGC,ONGC-1003,HEX BLT M12X50 SS304 DIN933 GR8.8,Fastener,SS304,12x50,mm,DIN933,8.8,,,12,5000,F1
+SAIL,SAIL-1002,Bolt Hexagonal M12 x 50mm Stainless 304 DIN 933 Grade 8.8,Fastener,SS304,12x50,mm,DIN933,8.8,,,14,3000,F1
+CPCL,CPCL-1002,BOLT HEX M12*50 SS304 DIN933 8.8,Fastener,SS304,12x50,mm,DIN933,8.8,,,13,4200,F1
+NTPC,NTPC-1003,HEX BOLT M12x50 SS304 DIN933 GR10.9,Fastener,SS304,12x50,mm,DIN933,10.9,,,16,1000,F2_conflict
+GAIL,GAIL-1002,Hex Bolt 0.5in x 2in SS304 DIN933 Grade 8.8,Fastener,SS304,12.7x50.8,inch,DIN933,8.8,,,15,1800,F3_unit
+ONGC,ONGC-1004,SS PIPE 50MM ASTM A312 TP304L,Pipe,Stainless Steel,50,mm,ASTM A312,TP304L,Sch40,,850,600,P1
+CPCL,CPCL-1003,Stainless Steel Pipe 50mm ASTM A312 Grade TP304L Sch40,Pipe,Stainless Steel,50,mm,ASTM A312,TP304L,Sch40,,880,400,P1
+SAIL,SAIL-1003,SS Pipe 50mm ASTM A312 TP304L Sch80,Pipe,Stainless Steel,50,mm,ASTM A312,TP304L,Sch80,,1100,250,P2_conflict
+NTPC,NTPC-1004,SS Pipe 50mm A312 TP304L Sch40 threaded end,Pipe,Stainless Steel,50,mm,ASTM A312,TP304L,Sch40,,900,150,P3_family
+GAIL,GAIL-1003,Pipe 50mm - material grade TBD,Pipe,,50,mm,,,,,800,100,P_insufficient
+ONGC,ONGC-1005,GATE VALVE 100MM CLASS150 CS BODY,Valve,Carbon Steel,100,mm,API600,N/A,150#,,4200,40,V1
+CPCL,CPCL-1004,Gate Valve 100mm Class 150 Carbon Steel Body API 600,Valve,Carbon Steel,100,mm,API600,N/A,150#,,4350,30,V1
+NTPC,NTPC-1005,Gate Valve 100mm Class300 CS Body API600,Valve,Carbon Steel,100,mm,API600,N/A,300#,,5800,20,V2_conflict
+SAIL,SAIL-1004,XLPE CABLE 3C 95SQMM 11KV,Cable,Copper,95,sqmm,IS7098,N/A,,11kV,680,2000,C1
+GAIL,GAIL-1004,XLPE Cable 3 Core 95 sq mm 11 kV IS 7098,Cable,Copper,95,sqmm,IS7098,N/A,,11kV,705,1500,C1
+ONGC,ONGC-1006,XLPE Cable 3C 95sqmm 33kV IS7098,Cable,Copper,95,sqmm,IS7098,N/A,,33kV,980,800,C2_conflict
