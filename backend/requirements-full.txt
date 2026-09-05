@@ -1,0 +1,8 @@
+# Optional: adds real sentence-transformers/MiniLM semantic matching.
+# Do NOT use this on Render's free tier -- torch + the model download often
+# exceed the 512MB RAM limit and the build will time out or crash.
+# Use this only on a paid tier, or when running locally / on Kaggle.
+#
+# Install with: pip install -r requirements-full.txt
+-r requirements.txt
+sentence-transformers==3.0.1
