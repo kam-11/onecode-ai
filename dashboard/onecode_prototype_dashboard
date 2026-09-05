@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>OneCode AI — Material Resolution Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12293C;
+    --steel:#1F4E63;
+    --teal:#146B63;
+    --teal-bg:#E6F1EF;
+    --amber:#9A6112;
+    --amber-bg:#FBF0DD;
+    --red:#8F3226;
+    --red-bg:#F8E9E5;
+    --slate:#4C616A;
+    --paper:#EDF0EE;
+    --panel:#FFFFFF;
+    --line:#D7DED9;
+    --mono:'IBM Plex Mono', monospace;
+    --sans:'IBM Plex Sans', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--sans); background:var(--paper); color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .console{max-width:1080px;margin:0 auto;padding:0 0 48px;}
+
+  /* header */
+  .header{
+    background:linear-gradient(135deg, var(--ink) 0%, var(--steel) 100%);
+    color:#EAF2F1; padding:28px 32px 24px; position:relative; overflow:hidden;
+  }
+  .header::after{
+    content:""; position:absolute; right:-40px; top:-40px; width:220px; height:220px;
+    border:1px solid rgba(255,255,255,0.08); border-radius:50%;
+  }
+  .header::before{
+    content:""; position:absolute; right:20px; top:40px; width:140px; height:140px;
+    border:1px solid rgba(255,255,255,0.06); border-radius:50%;
+  }
+  .eyebrow{font-family:var(--mono); font-size:11px; letter-spacing:0.04em; color:#9FC3BD; margin:0 0 6px;}
+  .h1{font-size:26px; font-weight:700; margin:0 0 4px; letter-spacing:-0.01em;}
+  .h1 small{font-weight:400; color:#B9D2CD; font-size:16px;}
+  .sub{font-size:13.5px; color:#C4D6D2; max-width:640px; line-height:1.5; margin:0;}
+
+  /* stat strip */
+  .stats{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line);
+    border:1px solid var(--line); margin:0 32px; transform:translateY(-1px);
+  }
+  .stat{background:var(--panel); padding:16px 18px;}
+  .stat .num{font-family:var(--mono); font-size:24px; font-weight:600; color:var(--ink);}
+  .stat .lbl{font-size:11.5px; color:var(--slate); margin-top:3px; line-height:1.35;}
+  .stat.good .num{color:var(--teal);}
+
+  .section{padding:28px 32px 0;}
+  .section-title{
+    font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;
+    color:var(--slate); margin:0 0 14px; display:flex; align-items:center; gap:8px;
+  }
+  .section-title::after{content:""; flex:1; height:1px; background:var(--line);}
+
+  /* decision distribution */
+  .dist{display:flex; flex-direction:column; gap:8px;}
+  .dist-row{display:grid; grid-template-columns:170px 1fr 40px; align-items:center; gap:10px;}
+  .dist-label{font-size:13px; font-weight:500;}
+  .dist-track{background:#E2E7E4; border-radius:3px; height:16px; overflow:hidden;}
+  .dist-fill{height:100%; border-radius:3px;}
+  .dist-count{font-family:var(--mono); font-size:13px; color:var(--slate); text-align:right;}
+
+  /* spotlight card */
+  .spotlight{
+    background:var(--red-bg); border:1px solid #E4C4BB; border-radius:6px; padding:18px 20px;
+    display:grid; grid-template-columns:1fr 1fr; gap:18px;
+  }
+  .spot-col .tag{font-family:var(--mono); font-size:10.5px; color:var(--red); letter-spacing:0.04em; margin-bottom:6px; display:block;}
+  .spot-desc{font-size:14px; font-weight:500; color:var(--ink); line-height:1.4;}
+  .spot-code{font-family:var(--mono); font-size:11.5px; color:var(--slate); margin-top:4px;}
+  .spot-verdict{
+    grid-column:1 / -1; border-top:1px solid #E4C4BB; padding-top:12px; margin-top:2px;
+    font-size:13.5px; color:var(--red); line-height:1.5;
+  }
+  .spot-verdict b{color:var(--ink);}
+
+  /* filter tabs */
+  .tabs{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
+  .tab{
+    font-family:var(--sans); font-size:12.5px; font-weight:500; padding:6px 12px;
+    border-radius:20px; border:1px solid var(--line); background:var(--panel); color:var(--slate);
+    cursor:pointer; transition:all .12s ease;
+  }
+  .tab:hover{border-color:var(--steel);}
+  .tab.active{background:var(--ink); color:#fff; border-color:var(--ink);}
+
+  /* results table */
+  .results{border:1px solid var(--line); border-radius:6px; overflow:hidden; background:var(--panel);}
+  .result-row{
+    display:grid; grid-template-columns:96px 1fr 130px 90px; gap:14px; padding:13px 16px;
+    border-bottom:1px solid var(--line); align-items:start;
+  }
+  .result-row:last-child{border-bottom:none;}
+  .result-row:hover{background:#F7F9F8;}
+  .r-cat{font-family:var(--mono); font-size:11px; color:var(--slate); padding-top:2px;}
+  .r-main .r-desc{font-size:13.5px; line-height:1.45; color:var(--ink);}
+  .r-main .r-desc .vs{color:var(--slate); font-weight:400; margin:0 6px;}
+  .r-main .r-evidence{font-size:12px; color:var(--slate); margin-top:5px; line-height:1.4;}
+  .r-score{font-family:var(--mono); font-size:11.5px; color:var(--slate); text-align:right; padding-top:2px; line-height:1.6;}
+  .r-score b{color:var(--ink); font-size:13px;}
+  .badge{
+    font-family:var(--mono); font-size:10.5px; font-weight:600; padding:3px 9px;
+    border-radius:3px; display:inline-block; white-space:nowrap; letter-spacing:0.01em;
+  }
+  .badge-exact{background:var(--teal-bg); color:var(--teal);}
+  .badge-functional{background:#E4EEF6; color:#265E85;}
+  .badge-near{background:var(--amber-bg); color:var(--amber);}
+  .badge-not{background:var(--red-bg); color:var(--red);}
+  .badge-insuff{background:#EEEBF3; color:#5B4A82;}
+
+  /* audit log */
+  .audit{border:1px solid var(--line); border-radius:6px; background:var(--panel); overflow:hidden;}
+  .audit-row{
+    display:flex; justify-content:space-between; gap:12px; padding:9px 16px; font-size:12px;
+    border-bottom:1px solid var(--line); color:var(--slate); font-family:var(--mono);
+  }
+  .audit-row:last-child{border-bottom:none;}
+  .audit-row .a-status{color:var(--amber); font-weight:600;}
+
+  .footnote{padding:24px 32px 0; font-size:11.5px; color:var(--slate); line-height:1.6; max-width:680px;}
+</style>
+</head>
+<body>
+<div class="console">
+
+  <div class="header">
+    <p class="eyebrow">ONECODE AI — MATERIAL RESOLUTION CONSOLE</p>
+    <h1 class="h1">Cross-CPSE Duplicate Resolution <small>working prototype</small></h1>
+    <p class="sub">Live output of the matching pipeline on a synthetic 17-record multi-CPSE dataset spanning bearings, fasteners, and pipes — normalization through 5-way decision, with full evidence and audit trail.</p>
+  </div>
+
+  <div class="stats" id="statStrip"></div>
+
+  <div class="section">
+    <p class="section-title">Decision distribution</p>
+    <div class="dist" id="distChart"></div>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Hard-block moment</p>
+    <div class="spotlight" id="spotlight"></div>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Match results</p>
+    <div class="tabs" id="tabs"></div>
+    <div class="results" id="resultsTable"></div>
+  </div>
+
+  <div class="section">
+    <p class="section-title">Audit trail</p>
+    <div class="audit" id="auditLog"></div>
+  </div>
+
+  <p class="footnote">Semantic similarity here uses TF-IDF cosine (no external model download available in this sandbox); the production build swaps in sentence-transformers/MiniLM on Kaggle. Dataset and thresholds are synthetic and illustrative, generated to exercise every decision branch — not real CPSE data.</p>
+
+</div>
+
+<script>
+const DATA = {"output": {"generated_at": "2026-09-04T14:18:26.795302+00:00", "total_records": 17, "candidate_pairs_evaluated": 41, "full_pairwise_would_be": 136, "compute_saved_by_blocking_pct": 69.9, "results": [{"pair": ["ONGC-1001", "SAIL-1001"], "cpse_pair": ["ONGC", "SAIL"], "descriptions": ["SKF BRG 6205 2RS", "Bearing Deep Groove 6205-2RS SKF"], "category": "Bearing", "combined_score": 0.7973, "fuzzy_score": 0.6667, "semantic_score": 0.4866, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.80"}, {"pair": ["ONGC-1001", "NTPC-1001"], "cpse_pair": ["ONGC", "NTPC"], "descriptions": ["SKF BRG 6205 2RS", "DGBB 6205 2RS"], "category": "Bearing", "combined_score": 0.7938, "fuzzy_score": 0.6897, "semantic_score": 0.4343, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.79"}, {"pair": ["ONGC-1001", "CPCL-1001"], "cpse_pair": ["ONGC", "CPCL"], "descriptions": ["SKF BRG 6205 2RS", "FAG Bearing 6205 2RS"], "category": "Bearing", "combined_score": 0.8028, "fuzzy_score": 0.7778, "semantic_score": 0.3475, "attribute_agreement": 1.0, "decision": "Functional Equivalent", "evidence": "Matching spec (attribute agreement 100%) but different manufacturer ('SKF' vs 'FAG') \u2014 same function, distinct identity"}, {"pair": ["ONGC-1001", "GAIL-1001"], "cpse_pair": ["ONGC", "GAIL"], "descriptions": ["SKF BRG 6205 2RS", "NSK BRG DGBB 6205-2RS"], "category": "Bearing", "combined_score": 0.853, "fuzzy_score": 0.8108, "semantic_score": 0.5488, "attribute_agreement": 1.0, "decision": "Functional Equivalent", "evidence": "Matching spec (attribute agreement 100%) but different manufacturer ('SKF' vs 'NSK') \u2014 same function, distinct identity"}, {"pair": ["ONGC-1001", "ONGC-1002"], "cpse_pair": ["ONGC", "ONGC"], "descriptions": ["SKF BRG 6205 2RS", "SKF BRG 6205 open type"], "category": "Bearing", "combined_score": 0.8063, "fuzzy_score": 0.6316, "semantic_score": 0.5842, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["ONGC-1001", "NTPC-1002"], "cpse_pair": ["ONGC", "NTPC"], "descriptions": ["SKF BRG 6205 2RS", "Bearing 6205 - spec not confirmed"], "category": "Bearing", "combined_score": 0.6507, "fuzzy_score": 0.4255, "semantic_score": 0.115, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["SAIL-1001", "NTPC-1001"], "cpse_pair": ["SAIL", "NTPC"], "descriptions": ["Bearing Deep Groove 6205-2RS SKF", "DGBB 6205 2RS"], "category": "Bearing", "combined_score": 0.7079, "fuzzy_score": 0.4889, "semantic_score": 0.3063, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.71"}, {"pair": ["SAIL-1001", "CPCL-1001"], "cpse_pair": ["SAIL", "CPCL"], "descriptions": ["Bearing Deep Groove 6205-2RS SKF", "FAG Bearing 6205 2RS"], "category": "Bearing", "combined_score": 0.7967, "fuzzy_score": 0.6923, "semantic_score": 0.445, "attribute_agreement": 1.0, "decision": "Functional Equivalent", "evidence": "Matching spec (attribute agreement 100%) but different manufacturer ('SKF' vs 'FAG') \u2014 same function, distinct identity"}, {"pair": ["SAIL-1001", "GAIL-1001"], "cpse_pair": ["SAIL", "GAIL"], "descriptions": ["Bearing Deep Groove 6205-2RS SKF", "NSK BRG DGBB 6205-2RS"], "category": "Bearing", "combined_score": 0.7464, "fuzzy_score": 0.6792, "semantic_score": 0.2131, "attribute_agreement": 1.0, "decision": "Functional Equivalent", "evidence": "Matching spec (attribute agreement 100%) but different manufacturer ('SKF' vs 'NSK') \u2014 same function, distinct identity"}, {"pair": ["SAIL-1001", "ONGC-1002"], "cpse_pair": ["SAIL", "ONGC"], "descriptions": ["Bearing Deep Groove 6205-2RS SKF", "SKF BRG 6205 open type"], "category": "Bearing", "combined_score": 0.7164, "fuzzy_score": 0.5556, "semantic_score": 0.2487, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["SAIL-1001", "NTPC-1002"], "cpse_pair": ["SAIL", "NTPC"], "descriptions": ["Bearing Deep Groove 6205-2RS SKF", "Bearing 6205 - spec not confirmed"], "category": "Bearing", "combined_score": 0.7187, "fuzzy_score": 0.5714, "semantic_score": 0.2361, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["NTPC-1001", "CPCL-1001"], "cpse_pair": ["NTPC", "CPCL"], "descriptions": ["DGBB 6205 2RS", "FAG Bearing 6205 2RS"], "category": "Bearing", "combined_score": 0.7613, "fuzzy_score": 0.6061, "semantic_score": 0.3972, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.76"}, {"pair": ["NTPC-1001", "GAIL-1001"], "cpse_pair": ["NTPC", "GAIL"], "descriptions": ["DGBB 6205 2RS", "NSK BRG DGBB 6205-2RS"], "category": "Bearing", "combined_score": 0.8686, "fuzzy_score": 0.7647, "semantic_score": 0.6958, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.87"}, {"pair": ["NTPC-1001", "ONGC-1002"], "cpse_pair": ["NTPC", "ONGC"], "descriptions": ["DGBB 6205 2RS", "SKF BRG 6205 open type"], "category": "Bearing", "combined_score": 0.6305, "fuzzy_score": 0.3429, "semantic_score": 0.1384, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["NTPC-1001", "NTPC-1002"], "cpse_pair": ["NTPC", "NTPC"], "descriptions": ["DGBB 6205 2RS", "Bearing 6205 - spec not confirmed"], "category": "Bearing", "combined_score": 0.6081, "fuzzy_score": 0.2727, "semantic_score": 0.1314, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["CPCL-1001", "GAIL-1001"], "cpse_pair": ["CPCL", "GAIL"], "descriptions": ["FAG Bearing 6205 2RS", "NSK BRG DGBB 6205-2RS"], "category": "Bearing", "combined_score": 0.7602, "fuzzy_score": 0.6829, "semantic_score": 0.2764, "attribute_agreement": 1.0, "decision": "Functional Equivalent", "evidence": "Matching spec (attribute agreement 100%) but different manufacturer ('FAG' vs 'NSK') \u2014 same function, distinct identity"}, {"pair": ["CPCL-1001", "ONGC-1002"], "cpse_pair": ["CPCL", "ONGC"], "descriptions": ["FAG Bearing 6205 2RS", "SKF BRG 6205 open type"], "category": "Bearing", "combined_score": 0.665, "fuzzy_score": 0.4762, "semantic_score": 0.1108, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["CPCL-1001", "NTPC-1002"], "cpse_pair": ["CPCL", "NTPC"], "descriptions": ["FAG Bearing 6205 2RS", "Bearing 6205 - spec not confirmed"], "category": "Bearing", "combined_score": 0.726, "fuzzy_score": 0.549, "semantic_score": 0.3063, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["GAIL-1001", "ONGC-1002"], "cpse_pair": ["GAIL", "ONGC"], "descriptions": ["NSK BRG DGBB 6205-2RS", "SKF BRG 6205 open type"], "category": "Bearing", "combined_score": 0.7235, "fuzzy_score": 0.5581, "semantic_score": 0.2805, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["GAIL-1001", "NTPC-1002"], "cpse_pair": ["GAIL", "NTPC"], "descriptions": ["NSK BRG DGBB 6205-2RS", "Bearing 6205 - spec not confirmed"], "category": "Bearing", "combined_score": 0.6683, "fuzzy_score": 0.5, "semantic_score": 0.0915, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["ONGC-1002", "NTPC-1002"], "cpse_pair": ["ONGC", "NTPC"], "descriptions": ["SKF BRG 6205 open type", "Bearing 6205 - spec not confirmed"], "category": "Bearing", "combined_score": 0.6983, "fuzzy_score": 0.6038, "semantic_score": 0.0859, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["ONGC-1003", "SAIL-1002"], "cpse_pair": ["ONGC", "SAIL"], "descriptions": ["HEX BLT M12X50 SS304 DIN933 GR8.8", "Bolt Hexagonal M12 x 50mm Stainless 304 DIN 933 Grade 8.8"], "category": "Fastener", "combined_score": 0.64, "fuzzy_score": 0.4667, "semantic_score": 0.0, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.64"}, {"pair": ["ONGC-1003", "CPCL-1002"], "cpse_pair": ["ONGC", "CPCL"], "descriptions": ["HEX BLT M12X50 SS304 DIN933 GR8.8", "BOLT HEX M12*50 SS304 DIN933 8.8"], "category": "Fastener", "combined_score": 0.7972, "fuzzy_score": 0.7385, "semantic_score": 0.3783, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.80"}, {"pair": ["ONGC-1003", "NTPC-1003"], "cpse_pair": ["ONGC", "NTPC"], "descriptions": ["HEX BLT M12X50 SS304 DIN933 GR8.8", "HEX BOLT M12x50 SS304 DIN933 GR10.9"], "category": "Fastener", "combined_score": 0.762, "fuzzy_score": 0.9118, "semantic_score": 0.5672, "attribute_agreement": 0.75, "decision": "Not Equivalent", "evidence": "Critical attribute 'grade' conflicts: '8.8' vs '10.9'"}, {"pair": ["ONGC-1003", "GAIL-1002"], "cpse_pair": ["ONGC", "GAIL"], "descriptions": ["HEX BLT M12X50 SS304 DIN933 GR8.8", "Hex Bolt 0.5in x 2in SS304 DIN933 Grade 8.8"], "category": "Fastener", "combined_score": 0.6257, "fuzzy_score": 0.6053, "semantic_score": 0.3458, "attribute_agreement": 0.75, "decision": "Not Equivalent", "evidence": "Dimension/model does not match after unit normalization"}, {"pair": ["SAIL-1002", "CPCL-1002"], "cpse_pair": ["SAIL", "CPCL"], "descriptions": ["Bolt Hexagonal M12 x 50mm Stainless 304 DIN 933 Grade 8.8", "BOLT HEX M12*50 SS304 DIN933 8.8"], "category": "Fastener", "combined_score": 0.7249, "fuzzy_score": 0.5843, "semantic_score": 0.2481, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.72"}, {"pair": ["SAIL-1002", "NTPC-1003"], "cpse_pair": ["SAIL", "NTPC"], "descriptions": ["Bolt Hexagonal M12 x 50mm Stainless 304 DIN 933 Grade 8.8", "HEX BOLT M12x50 SS304 DIN933 GR10.9"], "category": "Fastener", "combined_score": 0.5383, "fuzzy_score": 0.4783, "semantic_score": 0.0993, "attribute_agreement": 0.75, "decision": "Not Equivalent", "evidence": "Critical attribute 'grade' conflicts: '8.8' vs '10.9'"}, {"pair": ["SAIL-1002", "GAIL-1002"], "cpse_pair": ["SAIL", "GAIL"], "descriptions": ["Bolt Hexagonal M12 x 50mm Stainless 304 DIN 933 Grade 8.8", "Hex Bolt 0.5in x 2in SS304 DIN933 Grade 8.8"], "category": "Fastener", "combined_score": 0.5913, "fuzzy_score": 0.6, "semantic_score": 0.1816, "attribute_agreement": 0.75, "decision": "Not Equivalent", "evidence": "Dimension/model does not match after unit normalization"}, {"pair": ["CPCL-1002", "NTPC-1003"], "cpse_pair": ["CPCL", "NTPC"], "descriptions": ["BOLT HEX M12*50 SS304 DIN933 8.8", "HEX BOLT M12x50 SS304 DIN933 GR10.9"], "category": "Fastener", "combined_score": 0.7061, "fuzzy_score": 0.7463, "semantic_score": 0.536, "attribute_agreement": 0.75, "decision": "Not Equivalent", "evidence": "Critical attribute 'grade' conflicts: '8.8' vs '10.9'"}, {"pair": ["CPCL-1002", "GAIL-1002"], "cpse_pair": ["CPCL", "GAIL"], "descriptions": ["BOLT HEX M12*50 SS304 DIN933 8.8", "Hex Bolt 0.5in x 2in SS304 DIN933 Grade 8.8"], "category": "Fastener", "combined_score": 0.689, "fuzzy_score": 0.72, "semantic_score": 0.49, "attribute_agreement": 0.75, "decision": "Not Equivalent", "evidence": "Dimension/model does not match after unit normalization"}, {"pair": ["NTPC-1003", "GAIL-1002"], "cpse_pair": ["NTPC", "GAIL"], "descriptions": ["HEX BOLT M12x50 SS304 DIN933 GR10.9", "Hex Bolt 0.5in x 2in SS304 DIN933 Grade 8.8"], "category": "Fastener", "combined_score": 0.5326, "fuzzy_score": 0.6154, "semantic_score": 0.49, "attribute_agreement": 0.5, "decision": "Not Equivalent", "evidence": "Critical attribute 'grade' conflicts: '10.9' vs '8.8'"}, {"pair": ["ONGC-1004", "CPCL-1003"], "cpse_pair": ["ONGC", "CPCL"], "descriptions": ["SS PIPE 50MM ASTM A312 TP304L", "Stainless Steel Pipe 50mm ASTM A312 Grade TP304L Sch40"], "category": "Pipe", "combined_score": 0.8289, "fuzzy_score": 0.6988, "semantic_score": 0.5961, "attribute_agreement": 1.0, "decision": "Exact Duplicate", "evidence": "Structured attributes match exactly; attribute agreement 100%, text similarity 0.83"}, {"pair": ["ONGC-1004", "SAIL-1003"], "cpse_pair": ["ONGC", "SAIL"], "descriptions": ["SS PIPE 50MM ASTM A312 TP304L", "SS Pipe 50mm ASTM A312 TP304L Sch80"], "category": "Pipe", "combined_score": 0.8454, "fuzzy_score": 0.9062, "semantic_score": 0.8676, "attribute_agreement": 0.8, "decision": "Not Equivalent", "evidence": "Critical attribute 'pressure_rating' conflicts: 'Sch40' vs 'Sch80'"}, {"pair": ["ONGC-1004", "NTPC-1004"], "cpse_pair": ["ONGC", "NTPC"], "descriptions": ["SS PIPE 50MM ASTM A312 TP304L", "SS Pipe 50mm A312 TP304L Sch40 threaded end"], "category": "Pipe", "combined_score": 0.8306, "fuzzy_score": 0.6944, "semantic_score": 0.6115, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["ONGC-1004", "GAIL-1003"], "cpse_pair": ["ONGC", "GAIL"], "descriptions": ["SS PIPE 50MM ASTM A312 TP304L", "Pipe 50mm - material grade TBD"], "category": "Pipe", "combined_score": 0.7189, "fuzzy_score": 0.5614, "semantic_score": 0.2522, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["CPCL-1003", "SAIL-1003"], "cpse_pair": ["CPCL", "SAIL"], "descriptions": ["Stainless Steel Pipe 50mm ASTM A312 Grade TP304L Sch40", "SS Pipe 50mm ASTM A312 TP304L Sch80"], "category": "Pipe", "combined_score": 0.7327, "fuzzy_score": 0.764, "semantic_score": 0.5172, "attribute_agreement": 0.8, "decision": "Not Equivalent", "evidence": "Critical attribute 'pressure_rating' conflicts: 'Sch40' vs 'Sch80'"}, {"pair": ["CPCL-1003", "NTPC-1004"], "cpse_pair": ["CPCL", "NTPC"], "descriptions": ["Stainless Steel Pipe 50mm ASTM A312 Grade TP304L Sch40", "SS Pipe 50mm A312 TP304L Sch40 threaded end"], "category": "Pipe", "combined_score": 0.8196, "fuzzy_score": 0.7423, "semantic_score": 0.4844, "attribute_agreement": 1.0, "decision": "Near Duplicate", "evidence": "Same core spec but a real variant difference detected (e.g. seal/end type) \u2014 treat as material family, not identical"}, {"pair": ["CPCL-1003", "GAIL-1003"], "cpse_pair": ["CPCL", "GAIL"], "descriptions": ["Stainless Steel Pipe 50mm ASTM A312 Grade TP304L Sch40", "Pipe 50mm - material grade TBD"], "category": "Pipe", "combined_score": 0.6933, "fuzzy_score": 0.439, "semantic_score": 0.3079, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["SAIL-1003", "NTPC-1004"], "cpse_pair": ["SAIL", "NTPC"], "descriptions": ["SS Pipe 50mm ASTM A312 TP304L Sch80", "SS Pipe 50mm A312 TP304L Sch40 threaded end"], "category": "Pipe", "combined_score": 0.7369, "fuzzy_score": 0.7692, "semantic_score": 0.5305, "attribute_agreement": 0.8, "decision": "Not Equivalent", "evidence": "Critical attribute 'pressure_rating' conflicts: 'Sch80' vs 'Sch40'"}, {"pair": ["SAIL-1003", "GAIL-1003"], "cpse_pair": ["SAIL", "GAIL"], "descriptions": ["SS Pipe 50mm ASTM A312 TP304L Sch80", "Pipe 50mm - material grade TBD"], "category": "Pipe", "combined_score": 0.6961, "fuzzy_score": 0.5079, "semantic_score": 0.2188, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}, {"pair": ["NTPC-1004", "GAIL-1003"], "cpse_pair": ["NTPC", "GAIL"], "descriptions": ["SS Pipe 50mm A312 TP304L Sch40 threaded end", "Pipe 50mm - material grade TBD"], "category": "Pipe", "combined_score": 0.6738, "fuzzy_score": 0.4507, "semantic_score": 0.1931, "attribute_agreement": 1.0, "decision": "Insufficient Data", "evidence": "One or both records missing a required attribute (material/standard/critical spec)"}], "audit_log": [{"timestamp": "2026-09-04T14:18:26.757999+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1001", "SAIL-1001"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.759220+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1001", "NTPC-1001"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.760177+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1001", "CPCL-1001"], "decision": "Functional Equivalent", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.761041+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1001", "GAIL-1001"], "decision": "Functional Equivalent", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.763849+00:00", "action": "candidate_cluster_proposed", "materials": ["SAIL-1001", "NTPC-1001"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.764772+00:00", "action": "candidate_cluster_proposed", "materials": ["SAIL-1001", "CPCL-1001"], "decision": "Functional Equivalent", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.765658+00:00", "action": "candidate_cluster_proposed", "materials": ["SAIL-1001", "GAIL-1001"], "decision": "Functional Equivalent", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.768404+00:00", "action": "candidate_cluster_proposed", "materials": ["NTPC-1001", "CPCL-1001"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.769374+00:00", "action": "candidate_cluster_proposed", "materials": ["NTPC-1001", "GAIL-1001"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.772052+00:00", "action": "candidate_cluster_proposed", "materials": ["CPCL-1001", "GAIL-1001"], "decision": "Functional Equivalent", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.777425+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1003", "SAIL-1002"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.778408+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1003", "CPCL-1002"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.781391+00:00", "action": "candidate_cluster_proposed", "materials": ["SAIL-1002", "CPCL-1002"], "decision": "Exact Duplicate", "status": "pending_human_review"}, {"timestamp": "2026-09-04T14:18:26.786892+00:00", "action": "candidate_cluster_proposed", "materials": ["ONGC-1004", "CPCL-1003"], "decision": "Exact Duplicate", "status": "pending_human_review"}]}, "metrics": {"merge_detection_precision": 0.571, "merge_detection_recall": 0.727, "merge_detection_f1": 0.64, "critical_conflict_cases_evaluated": 8, "critical_conflicts_correctly_blocked": 8, "false_merge_rate_on_critical_conflicts": 0.0}};
+
+const DECISION_META = {
+  "Exact Duplicate":      { badge: "badge-exact",      bar: "#146B63" },
+  "Functional Equivalent":{ badge: "badge-functional", bar: "#265E85" },
+  "Near Duplicate":       { badge: "badge-near",       bar: "#9A6112" },
+  "Not Equivalent":       { badge: "badge-not",        bar: "#8F3226" },
+  "Insufficient Data":    { badge: "badge-insuff",     bar: "#5B4A82" },
+};
+
+function el(html){ const d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+
+// ---- stat strip ----
+const out = DATA.output, metrics = DATA.metrics;
+const statStrip = document.getElementById('statStrip');
+const stats = [
+  { num: out.total_records, lbl: "Material records ingested" },
+  { num: out.candidate_pairs_evaluated + ' / ' + out.full_pairwise_would_be, lbl: "Pairs compared vs. full pairwise" },
+  { num: out.compute_saved_by_blocking_pct + '%', lbl: "Compute saved by blocking before scoring", good:true },
+  { num: (metrics.false_merge_rate_on_critical_conflicts*100).toFixed(0) + '%', lbl: metrics.critical_conflict_cases_evaluated + ' critical-attribute conflicts — false merge rate', good:true },
+];
+stats.forEach(s => statStrip.appendChild(el(`<div class="stat ${s.good?'good':''}"><div class="num">${s.num}</div><div class="lbl">${s.lbl}</div></div>`)));
+
+// ---- decision distribution ----
+const counts = {};
+out.results.forEach(r => counts[r.decision] = (counts[r.decision]||0)+1);
+const maxCount = Math.max(...Object.values(counts));
+const distChart = document.getElementById('distChart');
+Object.keys(DECISION_META).forEach(dec => {
+  const c = counts[dec] || 0;
+  const pct = maxCount ? (c/maxCount*100) : 0;
+  distChart.appendChild(el(`
+    <div class="dist-row">
+      <div class="dist-label">${dec}</div>
+      <div class="dist-track"><div class="dist-fill" style="width:${pct}%;background:${DECISION_META[dec].bar}"></div></div>
+      <div class="dist-count">${c}</div>
+    </div>
+  `));
+});
+
+// ---- spotlight: pick a Not Equivalent case caused by a critical grade conflict ----
+const spotCase = out.results.find(r => r.decision === "Not Equivalent" && r.evidence.includes("grade"));
+if (spotCase) {
+  document.getElementById('spotlight').innerHTML = `
+    <div class="spot-col">
+      <span class="tag">${spotCase.cpse_pair[0]} · ${spotCase.pair[0]}</span>
+      <div class="spot-desc">${spotCase.descriptions[0]}</div>
+    </div>
+    <div class="spot-col">
+      <span class="tag">${spotCase.cpse_pair[1]} · ${spotCase.pair[1]}</span>
+      <div class="spot-desc">${spotCase.descriptions[1]}</div>
+    </div>
+    <div class="spot-verdict"><b>Blocked, not merged.</b> Text similarity alone was high (${(spotCase.fuzzy_score*100).toFixed(0)}% fuzzy match) — the descriptions read almost identically. ${spotCase.evidence}. A safety-critical attribute mismatch overrides similarity score every time, regardless of how close the wording looks.</div>
+  `;
+}
+
+// ---- results table with filter tabs ----
+const tabsEl = document.getElementById('tabs');
+const tableEl = document.getElementById('resultsTable');
+const decisionsPresent = ["All", ...Object.keys(DECISION_META)];
+let activeFilter = "All";
+
+function renderTable(){
+  tableEl.innerHTML = "";
+  const rows = out.results.filter(r => activeFilter === "All" || r.decision === activeFilter);
+  rows.forEach(r => {
+    const meta = DECISION_META[r.decision];
+    tableEl.appendChild(el(`
+      <div class="result-row">
+        <div class="r-cat">${r.category}<br><span class="badge ${meta.badge}" style="margin-top:6px;">${r.decision}</span></div>
+        <div class="r-main">
+          <div class="r-desc">${r.descriptions[0]}<span class="vs">vs</span>${r.descriptions[1]}</div>
+          <div class="r-evidence">${r.evidence}</div>
+        </div>
+        <div class="r-score">
+          score <b>${r.combined_score.toFixed(2)}</b><br>
+          fuzzy ${r.fuzzy_score.toFixed(2)} · attr ${(r.attribute_agreement*100).toFixed(0)}%
+        </div>
+        <div class="r-cat" style="text-align:right;">${r.cpse_pair[0]}<br>${r.cpse_pair[1]}</div>
+      </div>
+    `));
+  });
+  if (rows.length === 0) {
+    tableEl.appendChild(el(`<div class="result-row"><div class="r-main" style="grid-column:1/-1;color:var(--slate);">No results in this category.</div></div>`));
+  }
+}
+
+decisionsPresent.forEach(dec => {
+  const tab = el(`<button class="tab ${dec==='All'?'active':''}">${dec}${dec!=="All" ? ' ('+(counts[dec]||0)+')' : ''}</button>`);
+  tab.addEventListener('click', () => {
+    activeFilter = dec;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderTable();
+  });
+  tabsEl.appendChild(tab);
+});
+renderTable();
+
+// ---- audit log ----
+const auditEl = document.getElementById('auditLog');
+out.audit_log.forEach(a => {
+  const t = new Date(a.timestamp);
+  auditEl.appendChild(el(`
+    <div class="audit-row">
+      <span>${a.materials[0]} ↔ ${a.materials[1]} — ${a.decision}</span>
+      <span class="a-status">${a.status.replace(/_/g,' ')}</span>
+    </div>
+  `));
+});
+</script>
+</body>
+</html>
